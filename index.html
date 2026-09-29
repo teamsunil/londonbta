@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>LondonBTA — Professional training in London and worldwide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          paper: 'rgb(var(--paper) / <alpha-value>)',
+          surface: 'rgb(var(--surface) / <alpha-value>)',
+          ink: 'rgb(var(--ink) / <alpha-value>)',
+          muted: 'rgb(var(--muted) / <alpha-value>)',
+          line: 'rgb(var(--line) / <alpha-value>)',
+          navy: { DEFAULT: '#0F2238', deep: '#0A1828', soft: '#1B3350' },
+          brass: { DEFAULT: '#C9A052', dark: '#8E6B25', tint: 'rgb(var(--brass-tint) / <alpha-value>)' },
+        },
+        fontFamily: {
+          serif: ['Newsreader', 'Georgia', 'Times New Roman', 'serif'],
+          sans: ['"Schibsted Grotesk"', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        },
+        maxWidth: { site: '1280px' },
+      },
+    },
+  };
+</script>
+<style>
+  :root {
+    --paper: 246 247 249; --surface: 255 255 255; --ink: 15 34 56; --muted: 88 102 121;
+    --line: 223 227 234; --brass-tint: 246 239 224;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: 10 20 33; --surface: 17 31 49; --ink: 234 238 244; --muted: 160 173 191;
+      --line: 38 56 80; --brass-tint: 45 38 24; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: 10 20 33; --surface: 17 31 49; --ink: 234 238 244; --muted: 160 173 191;
+    --line: 38 56 80; --brass-tint: 45 38 24; color-scheme: dark;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + 88px); }
+  body { margin: 0; background: rgb(var(--paper)); color: rgb(var(--ink)); font-family: 'Schibsted Grotesk', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  img, svg { max-width: 100%; }
+  :focus-visible { outline: 2px solid #C9A052; outline-offset: 3px; border-radius: 4px; }
+  .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { scrollbar-width: none; }
+  .hero-in > * { opacity: 0; transform: translateY(14px); animation: rise .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  .hero-in > *:nth-child(2) { animation-delay: .08s } .hero-in > *:nth-child(3) { animation-delay: .16s } .hero-in > *:nth-child(4) { animation-delay: .24s }
+  .float-card { animation: rise .9s .5s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  .drawer-enter { animation: drawer .35s cubic-bezier(.2,.7,.2,1); }
+  @keyframes drawer { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+  select { -webkit-appearance: none; appearance: none; background-image: none; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .hero-in > *, .float-card { opacity: 1; transform: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.26.2/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
+
+/* =========================================================
+   DATA LAYER — mock content. Each export mirrors a future
+   API/CMS endpoint (/categories, /courses, /metrics ...).
+   ========================================================= */
+const data = {
+  metrics: [
+    { value: '20K+', label: 'Professionals trained' },
+    { value: '20+', label: 'Countries' },
+    { value: '25+', label: 'Years of experience' },
+    { value: '4.9/5', label: 'Learner rating' },
+  ],
+  clients: ['Meridian Energy', 'Halden & Co.', 'Northgate Ports', 'Civic Authority', 'Aster Health', 'Kestrel Bank', 'Orion Build', 'Vale Utilities'],
+  locations: ['London', 'Dubai', 'Istanbul', 'Barcelona', 'Kuala Lumpur', 'Paris', 'Online'],
+  formats: ['Classroom', 'Live online', 'In-house'],
+  months: [
+    { value: '2026-10', label: 'October 2026' }, { value: '2026-11', label: 'November 2026' },
+    { value: '2026-12', label: 'December 2026' }, { value: '2027-01', label: 'January 2027' },
+    { value: '2027-02', label: 'February 2027' },
+  ],
+  categories: [
+    { id: 'leadership', name: 'Management & Leadership', icon: 'compass', count: 86, desc: 'Lead teams, set direction and make better decisions under pressure.' },
+    { id: 'ai', name: 'AI & Digital Transformation', icon: 'cpu', count: 34, desc: 'Adopt AI responsibly and turn digital strategy into results.' },
+    { id: 'finance', name: 'Finance & Accounting', icon: 'landmark', count: 72, desc: 'Budgeting, reporting, risk and financial decision-making.' },
+    { id: 'hr', name: 'Human Resources', icon: 'users', count: 48, desc: 'Talent, reward, workforce planning and people strategy.' },
+    { id: 'pm', name: 'Project Management', icon: 'kanban', count: 41, desc: 'Plan, control and deliver projects and programmes on time.' },
+    { id: 'procurement', name: 'Procurement & Contracts', icon: 'file', count: 39, desc: 'Sourcing, negotiation and contract management that protects value.' },
+    { id: 'sales', name: 'Sales & Marketing', icon: 'trend', count: 29, desc: 'Grow revenue with modern selling, branding and customer insight.' },
+    { id: 'engineering', name: 'Engineering', icon: 'cog', count: 57, desc: 'Maintenance, reliability and technical management.' },
+    { id: 'construction', name: 'Construction', icon: 'crane', count: 26, desc: 'Construction management, claims, safety and quantity surveying.' },
+    { id: 'oilgas', name: 'Oil & Gas', icon: 'drop', count: 44, desc: 'Upstream to downstream operations, economics and safety.' },
+    { id: 'facilities', name: 'Facilities Management', icon: 'building', count: 22, desc: 'Run efficient, safe and sustainable buildings and estates.' },
+    { id: 'development', name: 'Professional Development', icon: 'spark', count: 63, desc: 'Communication, productivity and personal effectiveness.' },
+  ],
+};
+
+const s = (date, location, format) => ({ date, location, format });
+data.courses = [
+  { id: 'c1', featured: true, title: 'Strategic Leadership & Management', category: 'leadership', rating: 4.9, reviews: 412, duration: '5 days', price: 4950,
+    desc: 'Set strategy, align teams and lead change with confidence.',
+    sessions: [s('2026-10-19', 'London', 'Classroom'), s('2026-11-16', 'Dubai', 'Classroom'), s('2026-12-07', 'Online', 'Live online')] },
+  { id: 'c2', featured: true, title: 'AI for Business Leaders', category: 'ai', rating: 4.9, reviews: 188, duration: '3 days', price: 3450,
+    desc: 'Understand what AI can do for your organisation and where to start.',
+    sessions: [s('2026-10-26', 'London', 'Classroom'), s('2026-11-09', 'Online', 'Live online'), s('2027-01-18', 'Barcelona', 'Classroom')] },
+  { id: 'c3', featured: true, title: 'Financial Management for Non-Finance Managers', category: 'finance', rating: 4.8, reviews: 356, duration: '5 days', price: 4450,
+    desc: 'Read the numbers, build budgets and make sound financial calls.',
+    sessions: [s('2026-11-02', 'London', 'Classroom'), s('2026-12-14', 'Istanbul', 'Classroom'), s('2027-02-08', 'Online', 'Live online')] },
+  { id: 'c4', featured: true, title: 'Project Management Masterclass', category: 'pm', rating: 4.8, reviews: 297, duration: '5 days', price: 4650,
+    desc: 'Plan, control and deliver complex projects end to end.',
+    sessions: [s('2026-10-12', 'Dubai', 'Classroom'), s('2026-11-23', 'London', 'Classroom'), s('2027-01-11', 'Kuala Lumpur', 'Classroom')] },
+  { id: 'c5', featured: true, title: 'Advanced Contract Management', category: 'procurement', rating: 4.9, reviews: 221, duration: '5 days', price: 4750,
+    desc: 'Draft, negotiate and manage contracts that reduce risk.',
+    sessions: [s('2026-11-09', 'London', 'Classroom'), s('2026-12-07', 'Paris', 'Classroom'), s('2027-02-15', 'Online', 'Live online')] },
+  { id: 'c6', featured: true, title: 'Strategic HR Leadership', category: 'hr', rating: 4.8, reviews: 174, duration: '5 days', price: 4450,
+    desc: 'Connect people strategy to business performance.',
+    sessions: [s('2026-10-19', 'Istanbul', 'Classroom'), s('2026-12-14', 'London', 'Classroom'), s('2027-01-25', 'Online', 'Live online')] },
+  { id: 'c7', title: 'Generative AI for Business', category: 'ai', rating: 4.9, reviews: 142, duration: '2 days', price: 2450,
+    desc: 'Put generative AI to work on real business tasks, safely.',
+    sessions: [s('2026-10-15', 'Online', 'Live online'), s('2026-11-19', 'London', 'Classroom')] },
+  { id: 'c8', title: 'AI Governance & Risk', category: 'ai', rating: 4.8, reviews: 76, duration: '3 days', price: 3450,
+    desc: 'Build policies, controls and oversight for AI systems.',
+    sessions: [s('2026-12-01', 'London', 'Classroom'), s('2027-02-02', 'Dubai', 'Classroom')] },
+  { id: 'c9', title: 'Negotiation Skills for Managers', category: 'development', rating: 4.7, reviews: 263, duration: '3 days', price: 2950,
+    desc: 'Prepare, persuade and close agreements that last.',
+    sessions: [s('2026-10-26', 'Barcelona', 'Classroom'), s('2026-11-30', 'Online', 'Live online')] },
+  { id: 'c10', title: 'Maintenance Planning & Reliability', category: 'engineering', rating: 4.8, reviews: 189, duration: '5 days', price: 4350,
+    desc: 'Reduce downtime with planned, data-driven maintenance.',
+    sessions: [s('2026-11-16', 'Dubai', 'Classroom'), s('2027-01-18', 'Kuala Lumpur', 'Classroom')] },
+  { id: 'c11', title: 'Construction Claims & Dispute Management', category: 'construction', rating: 4.7, reviews: 98, duration: '5 days', price: 4550,
+    desc: 'Prevent, prepare and resolve construction claims.',
+    sessions: [s('2026-12-07', 'London', 'Classroom'), s('2027-02-22', 'Istanbul', 'Classroom')] },
+  { id: 'c12', title: 'Petroleum Economics & Risk Analysis', category: 'oilgas', rating: 4.8, reviews: 131, duration: '5 days', price: 4850,
+    desc: 'Evaluate projects and investments across the value chain.',
+    sessions: [s('2026-10-12', 'Kuala Lumpur', 'Classroom'), s('2026-11-23', 'Dubai', 'Classroom')] },
+  { id: 'c13', title: 'Strategic Facilities Management', category: 'facilities', rating: 4.7, reviews: 84, duration: '5 days', price: 4250,
+    desc: 'Align facilities strategy with organisational goals.',
+    sessions: [s('2026-11-02', 'London', 'Classroom'), s('2027-01-11', 'Online', 'Live online')] },
+  { id: 'c14', title: 'Digital Marketing Strategy', category: 'sales', rating: 4.7, reviews: 117, duration: '3 days', price: 2950,
+    desc: 'Plan channels, content and measurement that drive growth.',
+    sessions: [s('2026-10-19', 'Online', 'Live online'), s('2026-12-14', 'Barcelona', 'Classroom')] },
+  { id: 'c15', title: 'Leading High-Performance Teams', category: 'leadership', rating: 4.9, reviews: 203, duration: '3 days', price: 3250,
+    desc: 'Build trust, accountability and momentum in your team.',
+    sessions: [s('2026-11-09', 'Paris', 'Classroom'), s('2026-12-01', 'Online', 'Live online'), s('2027-02-01', 'London', 'In-house')] },
+  { id: 'c16', title: 'Procurement Strategy & Supplier Management', category: 'procurement', rating: 4.8, reviews: 145, duration: '5 days', price: 4450,
+    desc: 'Source strategically and get more from key suppliers.',
+    sessions: [s('2026-10-26', 'Dubai', 'Classroom'), s('2027-01-25', 'London', 'Classroom')] },
+];
+
+data.aiTracks = [
+  { title: 'AI for Executives', level: 'Board & C-suite', duration: '2 days', desc: 'What AI means for strategy, competition and your operating model.' },
+  { title: 'Generative AI for Business', level: 'All managers', duration: '2 days', desc: 'Hands-on use of generative tools for writing, analysis and research.' },
+  { title: 'AI Strategy', level: 'Senior leaders', duration: '3 days', desc: 'Find high-value use cases and build a roadmap you can fund.' },
+  { title: 'AI Governance', level: 'Risk, legal & compliance', duration: '3 days', desc: 'Policies, controls and regulation, including the EU AI Act.' },
+  { title: 'AI Transformation', level: 'Change & ops leaders', duration: '5 days', desc: 'Redesign processes and bring people with you through change.' },
+  { title: 'AI Literacy for Teams', level: 'Whole organisation', duration: '1 day', desc: 'A shared foundation so every team can work with AI confidently.' },
+];
+
+/* API-shaped helpers — swap bodies for fetch() later */
+const api = {
+  categoryById: (id) => data.categories.find((c) => c.id === id),
+  searchCourses: ({ q, category, location, format, month }) => {
+    const term = q.trim().toLowerCase();
+    return data.courses
+      .map((c) => {
+        const cat = api.categoryById(c.category);
+        const text = `${c.title} ${c.desc} ${cat.name}`.toLowerCase();
+        if (term && !term.split(/\s+/).every((w) => text.includes(w))) return null;
+        if (category && c.category !== category) return null;
+        const matching = c.sessions.filter((x) =>
+          (!location || x.location === location) &&
+          (!format || x.format === format) &&
+          (!month || x.date.startsWith(month)));
+        if (!matching.length) return null;
+        return { ...c, next: matching[0] };
+      })
+      .filter(Boolean);
+  },
+};
+
+const fmtDate = (iso) => new Date(iso + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const fmtPrice = (n) => '£' + n.toLocaleString('en-GB');
+
+/* =========================================================
+   ICONS — small inline set (Lucide geometry, 24px grid)
+   ========================================================= */
+const paths = {
+  search: <><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></>,
+  menu: <><path d="M4 7h16M4 12h16M4 17h16"/></>,
+  x: <><path d="M18 6 6 18M6 6l12 12"/></>,
+  arrow: <><path d="M5 12h14M13 6l6 6-6 6"/></>,
+  arrowUR: <><path d="M7 17 17 7M8 7h9v9"/></>,
+  star: <><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></>,
+  clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
+  pin: <><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></>,
+  monitor: <><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/></>,
+  calendar: <><rect x="3" y="5" width="18" height="16" rx="1.5"/><path d="M3 10h18M8 3v4M16 3v4"/></>,
+  chevDown: <><path d="m6 9 6 6 6-6"/></>,
+  chevL: <><path d="m15 6-6 6 6 6"/></>,
+  chevR: <><path d="m9 6 6 6-6 6"/></>,
+  check: <><path d="m5 12 5 5 9-10"/></>,
+  compass: <><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5z"/></>,
+  cpu: <><rect x="6" y="6" width="12" height="12" rx="1.5"/><rect x="9.5" y="9.5" width="5" height="5"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></>,
+  landmark: <><path d="M3 21h18M5 18V10M9.5 18V10M14.5 18V10M19 18V10M2.5 9 12 3.5 21.5 9z"/></>,
+  users: <><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></>,
+  kanban: <><rect x="3" y="3" width="18" height="18" rx="1.5"/><path d="M8 7v7M12 7v4M16 7v9"/></>,
+  file: <><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5M8.5 13h7M8.5 17h4"/></>,
+  trend: <><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></>,
+  cog: <><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9 7 7M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/></>,
+  crane: <><path d="M6 21V3l14 4H6M10 7v3M4 21h6M20 7v5"/><rect x="18" y="12" width="4" height="3"/></>,
+  drop: <><path d="M12 3s6 6.4 6 11a6 6 0 0 1-12 0c0-4.6 6-11 6-11z"/></>,
+  building: <><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h1M14 7h1M9 11h1M14 11h1M9 15h1M14 15h1M10 21v-3h4v3"/></>,
+  spark: <><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></>,
+  globe: <><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></>,
+  shield: <><path d="M12 3 4.5 6v6c0 4.5 3.2 7.8 7.5 9 4.3-1.2 7.5-4.5 7.5-9V6z"/><path d="m9 12 2 2 4-4"/></>,
+  phone: <><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></>,
+};
+function Icon({ name, size = 20, className = '', stroke = 1.7 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={stroke}
+      strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">{paths[name]}</svg>
+  );
+}
+
+/* =========================================================
+   PRIMITIVES
+   ========================================================= */
+const Container = ({ className = '', children }) => (
+  <div className={`mx-auto w-full max-w-site px-5 sm:px-8 lg:px-10 ${className}`}>{children}</div>
+);
+
+function Button({ variant = 'primary', as = 'a', className = '', children, ...rest }) {
+  const Tag = as;
+  const base = 'inline-flex items-center justify-center gap-2 rounded-[10px] font-semibold transition-colors duration-200 whitespace-nowrap';
+  const variants = {
+    primary: 'bg-brass text-navy-deep hover:bg-[#D8B26A] px-5 h-12 text-[15px]',
+    dark: 'bg-navy text-white hover:bg-navy-soft px-5 h-12 text-[15px]',
+    outline: 'border border-line bg-surface text-ink hover:border-ink/40 px-5 h-12 text-[15px]',
+    ghostLight: 'border border-white/25 text-white hover:bg-white/10 px-5 h-12 text-[15px]',
+  };
+  return <Tag className={`${base} ${variants[variant]} ${className}`} {...rest}>{children}</Tag>;
+}
+
+function SectionHead({ title, intro, action, light }) {
+  return (
+    <div className="mb-10 flex flex-col gap-5 md:mb-14 md:flex-row md:items-end md:justify-between">
+      <div className="max-w-2xl">
+        <h2 className={`font-serif text-[34px] leading-[1.08] tracking-[-0.01em] sm:text-[44px] lg:text-[52px] ${light ? 'text-white' : 'text-ink'}`}>{title}</h2>
+        {intro && <p className={`mt-4 text-[17px] leading-relaxed ${light ? 'text-white/70' : 'text-muted'}`}>{intro}</p>}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+const Rating = ({ value, reviews, light }) => (
+  <span className={`inline-flex items-center gap-1.5 text-sm ${light ? 'text-white/80' : 'text-ink'}`}>
+    <Icon name="star" size={15} className="fill-brass text-brass" stroke={1.2} />
+    <span className="font-semibold">{value.toFixed(1)}</span>
+    {reviews && <span className={light ? 'text-white/50' : 'text-muted'}>({reviews})</span>}
+  </span>
+);
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+const NAV = ['Courses', 'Learning Pathways', 'Training Solutions', 'Industries', 'Locations', 'Resources', 'About'];
+
+function Logo({ light }) {
+  return (
+    <a href="#top" className="flex items-center gap-2.5" aria-label="LondonBTA home">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
+        <rect width="30" height="30" rx="7" fill="#0F2238" />
+        <path d="M9 8v14h11" stroke="#C9A052" strokeWidth="2.6" fill="none" strokeLinecap="square" />
+        <circle cx="20" cy="10" r="2.2" fill="#fff" />
+      </svg>
+      <span className={`text-[19px] font-bold tracking-[-0.02em] ${light ? 'text-white' : 'text-ink'}`}>
+        London<span className="font-medium text-brass-dark dark:text-brass">BTA</span>
+      </span>
+    </a>
+  );
+}
+
+function Header({ onSearchClick }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  useEffect(() => { document.body.style.overflow = open ? 'hidden' : ''; }, [open]);
+
+  const go = () => { setOpen(false); onSearchClick(); };
+
+  return (
+    <>
+      <header className={`sticky z-40 border-b transition-all duration-300 ${scrolled ? 'border-line bg-surface/90 backdrop-blur-md' : 'border-transparent bg-paper'}`}
+        style={{ top: 'env(safe-area-inset-top, 0px)' }}>
+        <Container className={`flex items-center justify-between transition-all duration-300 ${scrolled ? 'h-16' : 'h-20'}`}>
+          <Logo />
+          <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary">
+            {NAV.map((n) => (
+              <a key={n} href={n === 'Courses' ? '#courses' : '#'} className="rounded-md px-3 py-2 text-[14.5px] font-medium text-ink/80 transition-colors hover:text-ink hover:bg-ink/[0.04]">{n}</a>
+            ))}
+          </nav>
+          <div className="flex items-center gap-2">
+            <button onClick={onSearchClick} aria-label="Search courses" className="grid h-11 w-11 place-items-center rounded-[10px] text-ink hover:bg-ink/[0.05]">
+              <Icon name="search" />
+            </button>
+            <Button href="#contact" className={`hidden sm:inline-flex ${scrolled ? '!h-10' : ''}`}>Talk to an Expert</Button>
+            <button onClick={() => setOpen(true)} aria-label="Open menu" className="grid h-11 w-11 place-items-center rounded-[10px] text-ink hover:bg-ink/[0.05] xl:hidden">
+              <Icon name="menu" />
+            </button>
+          </div>
+        </Container>
+      </header>
+
+      {open && (
+        <div className="drawer-enter fixed inset-0 z-50 flex flex-col bg-navy-deep text-white"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+          role="dialog" aria-modal="true" aria-label="Menu">
+          <Container className="flex h-20 items-center justify-between">
+            <Logo light />
+            <button onClick={() => setOpen(false)} aria-label="Close menu" className="grid h-11 w-11 place-items-center rounded-[10px] hover:bg-white/10"><Icon name="x" /></button>
+          </Container>
+          <Container className="flex-1 overflow-y-auto">
+            <button onClick={go} className="mb-6 flex w-full items-center gap-3 rounded-xl border border-white/15 bg-white/5 px-4 h-14 text-left text-white/60">
+              <Icon name="search" size={19} /> Search courses, skills or subjects
+            </button>
+            <nav aria-label="Mobile">
+              {NAV.map((n) => (
+                <a key={n} href={n === 'Courses' ? '#courses' : '#'} onClick={() => setOpen(false)}
+                  className="flex items-center justify-between border-b border-white/10 py-4 font-serif text-[26px] leading-tight">
+                  {n}<Icon name="chevR" size={20} className="text-white/40" />
+                </a>
+              ))}
+            </nav>
+          </Container>
+          <Container className="py-5">
+            <Button href="#contact" onClick={() => setOpen(false)} className="w-full">Talk to an Expert</Button>
+            <p className="mt-3 text-center text-sm text-white/50">Or call +44 20 7946 0123</p>
+          </Container>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* =========================================================
+   HERO — image slots are illustrated placeholders; replace
+   <Scene*> with <img> from the CMS in production.
+   ========================================================= */
+function SceneSpeaker() {
+  return (
+    <svg viewBox="0 0 400 500" className="h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Trainer presenting to a group of executives">
+      <rect width="400" height="500" fill="#1B3350" />
+      <rect x="0" y="330" width="400" height="170" fill="#132A44" />
+      <rect x="150" y="70" width="220" height="140" rx="4" fill="#26466B" />
+      <path d="M170 180 L215 140 L250 160 L300 105 L350 130" stroke="#C9A052" strokeWidth="5" fill="none" />
+      <rect x="170" y="88" width="70" height="8" rx="4" fill="#fff" opacity=".7" />
+      <circle cx="105" cy="165" r="30" fill="#8C6A4F" />
+      <path d="M100 138 q20-18 38 4 q-6-6-20-4 z" fill="#2A1F18" />
+      <path d="M55 330 q0-120 50-128 q50 8 50 128z" fill="#EDEFF2" />
+      <path d="M85 205 l20 40 l20-40" fill="#C9A052" opacity=".9" />
+      <path d="M150 250 l40-40" stroke="#EDEFF2" strokeWidth="14" strokeLinecap="round" />
+      {[40, 130, 220, 310].map((x, i) => (
+        <g key={i}>
+          <circle cx={x + 30} cy={400} r={24} fill={['#5B4636', '#C49A7A', '#3A2C22', '#A87C5C'][i]} />
+          <path d={`M${x - 5} 500 q0-70 35-72 q35 2 35 72z`} fill={['#0F2238', '#2E4A6E', '#40597A', '#0F2238'][i]} />
+        </g>
+      ))}
+    </svg>
+  );
+}
+function SceneTable() {
+  const seats = [0, 60, 120, 180, 240, 300];
+  return (
+    <svg viewBox="0 0 400 300" className="h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Managers collaborating around a table">
+      <rect width="400" height="300" fill="#E9E3D5" />
+      <ellipse cx="200" cy="150" rx="120" ry="72" fill="#FFFFFF" />
+      {seats.map((a, i) => {
+        const r = (a * Math.PI) / 180, x = 200 + Math.cos(r) * 150, y = 150 + Math.sin(r) * 95;
+        return <g key={i}><circle cx={x} cy={y} r="24" fill={['#0F2238', '#8C6A4F', '#2E4A6E', '#C49A7A', '#5B4636', '#40597A'][i]} /><circle cx={x} cy={y} r="11" fill={['#C49A7A', '#3A2C22', '#E0B895', '#2A1F18', '#A87C5C', '#E0B895'][i]} /></g>;
+      })}
+      <rect x="160" y="120" width="40" height="28" rx="2" fill="#0F2238" /><rect x="215" y="140" width="34" height="24" rx="2" fill="#C9A052" /><rect x="170" y="160" width="26" height="18" rx="2" fill="#DFE3EA" />
+    </svg>
+  );
+}
+function SceneLaptop() {
+  return (
+    <svg viewBox="0 0 400 300" className="h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Professional joining a live online session">
+      <rect width="400" height="300" fill="#C9A052" />
+      <rect x="70" y="60" width="260" height="160" rx="8" fill="#0F2238" />
+      {[[85, 75], [210, 75], [85, 148], [210, 148]].map(([x, y], i) => (
+        <g key={i}><rect x={x} y={y} width="105" height="62" rx="4" fill={['#1B3350', '#26466B', '#26466B', '#1B3350'][i]} />
+          <circle cx={x + 52} cy={y + 26} r="12" fill={['#C49A7A', '#5B4636', '#E0B895', '#8C6A4F'][i]} />
+          <path d={`M${x + 32} ${y + 62} q20-24 40 0z`} fill="#EDEFF2" opacity=".85" /></g>
+      ))}
+      <path d="M40 228 h320 l-20 16 H60z" fill="#0A1828" />
+    </svg>
+  );
+}
+
+function Hero({ onExplore }) {
+  return (
+    <section id="top" className="relative overflow-hidden">
+      <Container className="grid items-center gap-12 pb-16 pt-8 md:pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-24 lg:pt-16">
+        <div className="hero-in">
+          <p className="text-[15px] font-medium text-brass-dark dark:text-brass">Global professional training</p>
+          <h1 className="mt-5 font-serif text-[46px] font-medium leading-[1.02] tracking-[-0.02em] text-ink sm:text-[64px] lg:text-[76px]">
+            Training that moves careers and organisations forward.
+          </h1>
+          <p className="mt-6 max-w-[34rem] text-[18px] leading-relaxed text-muted sm:text-[19px]">
+            Expert-led professional training for leaders, professionals and organisations — delivered in London and worldwide.
+          </p>
+          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <Button as="button" onClick={onExplore} className="!h-[52px] !px-7">Explore Courses <Icon name="arrow" size={18} /></Button>
+            <Button variant="outline" href="#contact" className="!h-[52px] !px-7">Corporate Training</Button>
+          </div>
+        </div>
+
+        <div className="relative">
+          <div className="grid h-[420px] grid-cols-5 grid-rows-2 gap-3 sm:h-[520px] lg:h-[560px]">
+            <div className="col-span-3 row-span-2 overflow-hidden rounded-[18px]"><SceneSpeaker /></div>
+            <div className="col-span-2 overflow-hidden rounded-[18px]"><SceneTable /></div>
+            <div className="col-span-2 overflow-hidden rounded-[18px]"><SceneLaptop /></div>
+          </div>
+          <div className="float-card absolute -left-3 bottom-8 flex items-center gap-3 rounded-[14px] border border-line bg-surface px-4 py-3 shadow-[0_18px_40px_-18px_rgba(15,34,56,.35)] sm:-left-6">
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-brass-tint text-brass-dark dark:text-brass"><Icon name="users" size={19} /></span>
+            <div><p className="text-[20px] font-bold leading-none text-ink">20K+</p><p className="mt-1 text-[13px] text-muted">professionals trained</p></div>
+          </div>
+          <div className="float-card absolute -right-2 top-6 hidden rounded-[14px] border border-line bg-surface px-4 py-3 shadow-[0_18px_40px_-18px_rgba(15,34,56,.35)] sm:block">
+            <div className="flex gap-0.5 text-brass">{[...Array(5)].map((_, i) => <Icon key={i} name="star" size={14} className="fill-brass" stroke={1} />)}</div>
+            <p className="mt-1.5 text-[20px] font-bold leading-none text-ink">4.9/5</p><p className="mt-1 text-[13px] text-muted">learner rating</p>
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/* =========================================================
+   COURSE SEARCH — live filtering against mock data
+   ========================================================= */
+function Select({ label, icon, value, onChange, options, placeholder }) {
+  return (
+    <label className="relative flex min-w-0 flex-1 flex-col rounded-xl border border-line bg-surface px-4 py-2.5 transition-colors focus-within:border-brass hover:border-ink/30">
+      <span className="text-[12.5px] font-medium text-muted">{label}</span>
+      <span className="flex items-center gap-2">
+        <Icon name={icon} size={16} className="shrink-0 text-muted" />
+        <select value={value} onChange={(e) => onChange(e.target.value)} className="w-full min-w-0 cursor-pointer truncate bg-transparent py-0.5 pr-6 text-[15px] font-medium text-ink outline-none">
+          <option value="">{placeholder}</option>
+          {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+        <Icon name="chevDown" size={16} className="pointer-events-none absolute right-3 top-1/2 text-muted" />
+      </span>
+    </label>
+  );
+}
+
+function ResultRow({ c }) {
+  const cat = api.categoryById(c.category);
+  return (
+    <a href="#" className="group grid gap-3 border-b border-line py-5 last:border-0 md:grid-cols-[1fr_auto] md:items-center md:gap-8">
+      <div>
+        <p className="text-[13px] font-medium text-brass-dark dark:text-brass">{cat.name}</p>
+        <h4 className="mt-1 text-[18px] font-semibold leading-snug text-ink group-hover:underline decoration-brass underline-offset-4">{c.title}</h4>
+        <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1.5 text-[14px] text-muted">
+          <span className="inline-flex items-center gap-1.5"><Icon name="calendar" size={15} />{fmtDate(c.next.date)}</span>
+          <span className="inline-flex items-center gap-1.5"><Icon name="pin" size={15} />{c.next.location}</span>
+          <span className="inline-flex items-center gap-1.5"><Icon name="monitor" size={15} />{c.next.format}</span>
+          <span className="inline-flex items-center gap-1.5"><Icon name="clock" size={15} />{c.duration}</span>
+        </div>
+      </div>
+      <div className="flex items-center justify-between gap-6 md:justify-end">
+        <div className="text-right"><p className="text-[18px] font-bold text-ink">{fmtPrice(c.price)}</p><Rating value={c.rating} /></div>
+        <span className="grid h-10 w-10 place-items-center rounded-full border border-line text-ink transition-all group-hover:border-brass group-hover:bg-brass group-hover:text-navy-deep"><Icon name="arrow" size={17} /></span>
+      </div>
+    </a>
+  );
+}
+
+function CourseSearch({ inputRef, filters, setFilters, searched, setSearched }) {
+  const set = (k) => (v) => setFilters((f) => ({ ...f, [k]: v }));
+  const results = useMemo(() => api.searchCourses(filters), [filters]);
+  const [limit, setLimit] = useState(5);
+  const active = Object.values(filters).some(Boolean);
+  const submit = (e) => { e.preventDefault(); setSearched(true); setLimit(5); setTimeout(() => document.getElementById('results')?.scrollIntoView({ block: 'start' }), 30); };
+  const reset = () => { setFilters({ q: '', category: '', location: '', format: '', month: '' }); };
+
+  const quick = ['Leadership', 'AI', 'Contract management', 'Finance', 'Project'];
+
+  return (
+    <section id="courses" className="relative z-10">
+      <Container>
+        <div className="rounded-[22px] bg-navy p-5 text-white shadow-[0_30px_60px_-30px_rgba(10,24,40,.6)] sm:p-8 lg:p-10">
+          <h2 className="font-serif text-[28px] leading-tight sm:text-[36px]">Find the right training for your goals</h2>
+          <form onSubmit={submit} className="mt-6" role="search">
+            <label className="flex items-center gap-3 rounded-xl bg-surface px-4 text-ink sm:px-5">
+              <Icon name="search" size={22} className="shrink-0 text-muted" />
+              <span className="sr-only">Search courses</span>
+              <input ref={inputRef} value={filters.q} onChange={(e) => set('q')(e.target.value)} placeholder="Search courses, skills or subjects"
+                className="h-[60px] w-full min-w-0 bg-transparent text-[17px] outline-none placeholder:text-muted/80 sm:h-[68px] sm:text-[19px]" />
+              {filters.q && <button type="button" onClick={() => set('q')('')} aria-label="Clear search" className="text-muted hover:text-ink"><Icon name="x" size={18} /></button>}
+            </label>
+            <div className="mt-3 grid grid-cols-2 gap-3 text-ink lg:flex">
+              <Select label="Category" icon="compass" value={filters.category} onChange={set('category')} placeholder="All categories" options={data.categories.map((c) => ({ value: c.id, label: c.name }))} />
+              <Select label="Location" icon="pin" value={filters.location} onChange={set('location')} placeholder="Anywhere" options={data.locations.map((l) => ({ value: l, label: l }))} />
+              <Select label="Format" icon="monitor" value={filters.format} onChange={set('format')} placeholder="Any format" options={data.formats.map((f) => ({ value: f, label: f }))} />
+              <Select label="Date" icon="calendar" value={filters.month} onChange={set('month')} placeholder="Any date" options={data.months} />
+              <Button as="button" type="submit" className="col-span-2 !h-auto min-h-[60px] !px-7 lg:col-span-1">Search Courses</Button>
+            </div>
+          </form>
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-[14px]">
+            <span className="mr-1 text-white/55">Popular:</span>
+            {quick.map((q) => (
+              <button key={q} onClick={() => { set('q')(q); setSearched(true); }} className="rounded-full border border-white/20 px-3 py-1.5 text-white/85 transition-colors hover:border-brass hover:text-white">{q}</button>
+            ))}
+          </div>
+        </div>
+
+        {(searched || active) && (
+          <div id="results" className="mt-6 rounded-[22px] border border-line bg-surface p-5 sm:p-8">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+              <p className="text-[15px] text-muted"><span className="font-semibold text-ink">{results.length}</span> {results.length === 1 ? 'course matches' : 'courses match'} your search</p>
+              {active && <button onClick={reset} className="text-[14px] font-semibold text-brass-dark underline underline-offset-4 dark:text-brass">Clear filters</button>}
+            </div>
+            {results.length ? (
+              <>
+                {results.slice(0, limit).map((c) => <ResultRow key={c.id} c={c} />)}
+                {results.length > limit && (
+                  <div className="pt-5 text-center"><Button variant="outline" as="button" onClick={() => setLimit((l) => l + 5)}>Show {Math.min(5, results.length - limit)} more</Button></div>
+                )}
+              </>
+            ) : (
+              <div className="py-12 text-center">
+                <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brass-tint text-brass-dark dark:text-brass"><Icon name="search" size={24} /></span>
+                <h4 className="mt-5 text-[20px] font-semibold text-ink">No scheduled courses match these filters</h4>
+                <p className="mx-auto mt-2 max-w-md text-[15px] leading-relaxed text-muted">Try a broader search term or remove a filter. Any course can also run in-house, on dates and in a location that suit your team.</p>
+                <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+                  <Button variant="dark" as="button" onClick={reset}>Clear filters</Button>
+                  <Button variant="outline" href="#contact">Ask about in-house delivery</Button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </Container>
+    </section>
+  );
+}
+
+/* =========================================================
+   TRUST
+   ========================================================= */
+function Trust() {
+  return (
+    <section className="py-20 lg:py-28">
+      <Container>
+        <h2 className="max-w-xl font-serif text-[30px] leading-[1.12] text-ink sm:text-[38px]">Trusted by professionals and organisations worldwide</h2>
+        <div className="mt-10 grid grid-cols-2 border-l border-t border-line sm:grid-cols-4">
+          {data.clients.map((c, i) => (
+            <div key={c} className="flex h-24 items-center justify-center border-b border-r border-line px-4 text-center sm:h-28">
+              <span className={`text-[15px] text-ink/45 sm:text-[17px] ${i % 3 === 0 ? 'font-serif italic text-[18px] sm:text-[20px]' : i % 3 === 1 ? 'font-bold tracking-[0.12em] uppercase text-[13px] sm:text-[14px]' : 'font-semibold tracking-tight'}`}>{c}</span>
+            </div>
+          ))}
+        </div>
+        <dl className="mt-16 grid grid-cols-2 gap-y-10 lg:grid-cols-4">
+          {data.metrics.map((m, i) => (
+            <div key={m.label} className={`flex flex-col pr-4 ${i > 0 ? 'lg:border-l lg:border-line lg:pl-8' : ''} ${i % 2 === 1 ? 'border-l border-line pl-5 lg:pl-8' : ''}`}>
+              <dt className="order-2 mt-2 text-[15px] text-muted">{m.label}</dt>
+              <dd className="font-serif text-[48px] leading-none tracking-[-0.02em] text-ink sm:text-[64px]">{m.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </Container>
+    </section>
+  );
+}
+
+/* =========================================================
+   CATEGORIES
+   ========================================================= */
+function Categories({ onPick }) {
+  return (
+    <section className="border-t border-line bg-surface py-20 lg:py-28">
+      <Container>
+        <SectionHead title="Explore training by expertise" intro="Over 600 courses across twelve disciplines, each designed with practitioners and updated every year."
+          action={<a href="#courses" className="inline-flex items-center gap-2 text-[15px] font-semibold text-ink underline decoration-brass underline-offset-[6px]">View all courses</a>} />
+        <div className="grid gap-px overflow-hidden rounded-[18px] border border-line bg-line sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {data.categories.map((c) => (
+            <button key={c.id} onClick={() => onPick(c.id)}
+              className="group relative flex min-h-[220px] flex-col bg-surface p-6 text-left transition-colors hover:bg-paper sm:p-7">
+              <span className="absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 bg-brass transition-transform duration-300 group-hover:scale-x-100" />
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-brass-tint text-brass-dark transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 dark:text-brass">
+                <Icon name={c.icon} size={22} />
+              </span>
+              <h3 className="mt-6 text-[18px] font-semibold leading-snug text-ink">{c.name}</h3>
+              <p className="mt-2 text-[14.5px] leading-relaxed text-muted">{c.desc}</p>
+              <span className="mt-auto flex items-center justify-between pt-5 text-[14px]">
+                <span className="font-medium text-ink/70">{c.count} courses</span>
+                <Icon name="arrow" size={18} className="text-ink transition-transform duration-300 group-hover:translate-x-1 group-hover:text-brass-dark" />
+              </span>
+            </button>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/* =========================================================
+   FEATURED COURSES
+   ========================================================= */
+function CourseCard({ c }) {
+  const cat = api.categoryById(c.category);
+  const next = c.sessions[0];
+  return (
+    <article className="group flex h-full w-[84vw] max-w-[360px] shrink-0 snap-start flex-col rounded-[16px] border border-line bg-surface transition-shadow duration-300 hover:shadow-[0_24px_48px_-28px_rgba(15,34,56,.4)] sm:w-auto sm:max-w-none">
+      <div className="flex items-center justify-between border-b border-line px-6 py-4">
+        <span className="inline-flex items-center gap-2 text-[13.5px] font-medium text-ink/75"><Icon name={cat.icon} size={16} className="text-brass-dark dark:text-brass" />{cat.name}</span>
+        <Rating value={c.rating} reviews={c.reviews} />
+      </div>
+      <div className="flex flex-1 flex-col p-6">
+        <h3 className="font-serif text-[25px] leading-[1.15] text-ink">{c.title}</h3>
+        <p className="mt-3 text-[15px] leading-relaxed text-muted">{c.desc}</p>
+        <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-3 text-[14px]">
+          {[['clock', 'Duration', c.duration], ['pin', 'Location', next.location], ['monitor', 'Format', next.format], ['calendar', 'Next date', fmtDate(next.date)]].map(([ic, l, v]) => (
+            <div key={l} className="flex items-start gap-2"><Icon name={ic} size={16} className="mt-0.5 shrink-0 text-muted" /><div><dt className="sr-only">{l}</dt><dd className="text-ink">{v}</dd></div></div>
+          ))}
+        </dl>
+        <div className="mt-auto flex items-end justify-between gap-4 border-t border-line pt-5 mt-6">
+          <div><p className="text-[12.5px] text-muted">From</p><p className="text-[22px] font-bold leading-tight text-ink">{fmtPrice(c.price)}</p></div>
+          <Button variant="dark" href="#" className="!h-11 !px-4 text-[14px]">View Course</Button>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function Featured() {
+  const ref = useRef(null);
+  const scroll = (d) => ref.current?.scrollBy({ left: d * ref.current.clientWidth * 0.85, behavior: 'smooth' });
+  const featured = data.courses.filter((c) => c.featured);
+  return (
+    <section className="py-20 lg:py-28">
+      <Container>
+        <SectionHead title="Popular courses" intro="The programmes professionals choose most — scheduled across London, Dubai, Europe, Asia and online."
+          action={
+            <div className="flex gap-2 sm:hidden">
+              <button onClick={() => scroll(-1)} aria-label="Previous courses" className="grid h-11 w-11 place-items-center rounded-full border border-line bg-surface"><Icon name="chevL" size={18} /></button>
+              <button onClick={() => scroll(1)} aria-label="Next courses" className="grid h-11 w-11 place-items-center rounded-full border border-line bg-surface"><Icon name="chevR" size={18} /></button>
+            </div>} />
+      </Container>
+      <div ref={ref} className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-2 sm:mx-auto sm:grid sm:max-w-site sm:snap-none sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-8 lg:grid-cols-3 lg:px-10">
+        {featured.map((c) => <CourseCard key={c.id} c={c} />)}
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================
+   AI & DIGITAL TRANSFORMATION
+   ========================================================= */
+function AISection() {
+  const steps = ['Literacy', 'Application', 'Strategy', 'Governance', 'Transformation'];
+  return (
+    <section className="relative overflow-hidden bg-navy-deep py-20 text-white lg:py-32">
+      <svg className="pointer-events-none absolute right-[-10%] top-[-20%] h-[720px] w-[720px] opacity-[0.12]" viewBox="0 0 400 400" aria-hidden="true">
+        {[...Array(9)].map((_, i) => <circle key={i} cx="200" cy="200" r={30 + i * 20} fill="none" stroke="#C9A052" strokeWidth="1" />)}
+        {[...Array(12)].map((_, i) => { const a = (i * 30 * Math.PI) / 180; return <circle key={'d' + i} cx={200 + Math.cos(a) * (70 + (i % 4) * 40)} cy={200 + Math.sin(a) * (70 + (i % 4) * 40)} r="3" fill="#C9A052" />; })}
+      </svg>
+      <Container className="relative">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_1fr] lg:items-end lg:gap-20">
+          <div>
+            <p className="inline-flex items-center gap-2 rounded-full border border-brass/40 px-3 py-1 text-[13.5px] text-brass"><Icon name="cpu" size={15} /> AI & Digital Transformation</p>
+            <h2 className="mt-6 font-serif text-[40px] leading-[1.04] tracking-[-0.015em] sm:text-[56px] lg:text-[68px]">Build AI capability across your organisation</h2>
+          </div>
+          <div>
+            <p className="text-[18px] leading-relaxed text-white/70">From AI fundamentals to strategy, governance and transformation, develop the capabilities needed to lead confidently in an AI-driven workplace.</p>
+            <ol className="mt-8 flex flex-wrap items-center gap-y-3 text-[13.5px]" aria-label="AI capability pathway">
+              {steps.map((st, i) => (
+                <li key={st} className="flex items-center">
+                  <span className="rounded-full bg-white/[0.07] px-3 py-1.5 text-white/85">{st}</span>
+                  {i < steps.length - 1 && <span className="mx-1.5 h-px w-4 bg-brass/60" aria-hidden="true" />}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
+        <div className="mt-14 grid gap-px overflow-hidden rounded-[18px] border border-white/10 bg-white/10 sm:grid-cols-2 lg:mt-20 lg:grid-cols-3">
+          {data.aiTracks.map((t) => (
+            <a key={t.title} href="#" className="group flex flex-col bg-navy-deep p-7 transition-colors hover:bg-navy sm:p-8">
+              <div className="flex items-center justify-between text-[13.5px] text-white/55">
+                <span>{t.level}</span><span className="inline-flex items-center gap-1.5"><Icon name="clock" size={14} />{t.duration}</span>
+              </div>
+              <h3 className="mt-8 font-serif text-[28px] leading-tight">{t.title}</h3>
+              <p className="mt-3 text-[15px] leading-relaxed text-white/65">{t.desc}</p>
+              <span className="mt-8 inline-flex items-center gap-2 text-[14.5px] font-semibold text-brass">
+                Explore programme <Icon name="arrow" size={16} className="transition-transform group-hover:translate-x-1" />
+              </span>
+            </a>
+          ))}
+        </div>
+
+        <div className="mt-10 flex flex-col items-start justify-between gap-6 rounded-[18px] border border-white/10 bg-white/[0.04] p-6 sm:flex-row sm:items-center sm:p-8">
+          <div className="flex items-start gap-4">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brass text-navy-deep"><Icon name="shield" size={20} /></span>
+            <div>
+              <p className="text-[17px] font-semibold">Rolling out AI to a whole team?</p>
+              <p className="mt-1 text-[15px] text-white/65">We assess current capability, then design a tailored programme across all levels.</p>
+            </div>
+          </div>
+          <Button href="#contact" className="w-full sm:w-auto">Plan an AI programme</Button>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/* =========================================================
+   CLOSING CTA + FOOTER
+   ========================================================= */
+function ContactCTA() {
+  return (
+    <section id="contact" className="py-20 lg:py-28">
+      <Container>
+        <div className="grid overflow-hidden rounded-[22px] border border-line bg-surface lg:grid-cols-[1.2fr_1fr]">
+          <div className="p-7 sm:p-12">
+            <h2 className="font-serif text-[34px] leading-[1.08] text-ink sm:text-[46px]">Planning training for your team?</h2>
+            <p className="mt-4 max-w-lg text-[17px] leading-relaxed text-muted">Tell us what your people need to achieve. A training consultant will recommend courses or design an in-house programme, usually within one working day.</p>
+            <ul className="mt-8 space-y-3 text-[15.5px] text-ink">
+              {['Tailored in-house programmes in any country', 'Group rates for three or more delegates', 'Impact reporting for HR and L&D teams'].map((t) => (
+                <li key={t} className="flex items-center gap-3"><span className="grid h-6 w-6 place-items-center rounded-full bg-brass-tint text-brass-dark dark:text-brass"><Icon name="check" size={14} stroke={2.2} /></span>{t}</li>
+              ))}
+            </ul>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Button href="#">Talk to an Expert</Button>
+              <Button variant="outline" href="tel:+442079460123"><Icon name="phone" size={17} /> +44 20 7946 0123</Button>
+            </div>
+          </div>
+          <div className="relative min-h-[260px] bg-navy">
+            <svg viewBox="0 0 400 360" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map of LondonBTA training locations">
+              <rect width="400" height="360" fill="#0F2238" />
+              {[...Array(18)].map((_, r) => [...Array(22)].map((_, c) => {
+                const x = 10 + c * 18, y = 12 + r * 19;
+                const land = Math.sin(c * 0.55 + r * 0.3) + Math.cos(r * 0.7 - c * 0.2) > 0.3;
+                return land ? <circle key={r + '-' + c} cx={x} cy={y} r="1.6" fill="#fff" opacity=".18" /> : null;
+              }))}
+              {[[118, 98, 'London'], [150, 120, 'Paris'], [128, 150, 'Barcelona'], [205, 140, 'Istanbul'], [262, 200, 'Dubai'], [336, 262, 'Kuala Lumpur']].map(([x, y, n], i) => (
+                <g key={n}>
+                  <circle cx={x} cy={y} r={i === 0 ? 9 : 5} fill="#C9A052" opacity={i === 0 ? 1 : 0.9} />
+                  {i === 0 && <circle cx={x} cy={y} r="18" fill="none" stroke="#C9A052" opacity=".5" />}
+                  <text x={x + 12} y={y + 4} fill="#fff" fontSize="12" fontFamily="Schibsted Grotesk, sans-serif" opacity=".85">{n}</text>
+                </g>
+              ))}
+            </svg>
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function Footer() {
+  const cols = {
+    Courses: ['All courses', 'Course calendar', 'Learning pathways', 'Online training'],
+    Solutions: ['In-house training', 'Corporate programmes', 'AI capability', 'Government'],
+    Company: ['About us', 'Our trainers', 'Locations', 'Contact'],
+  };
+  return (
+    <footer className="bg-navy-deep pt-16 text-white">
+      <Container>
+        <div className="grid gap-10 border-b border-white/10 pb-12 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+          <div>
+            <Logo light />
+            <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-white/60">Professional training and executive education, delivered in London and worldwide since 2000.</p>
+          </div>
+          {Object.entries(cols).map(([h, links]) => (
+            <div key={h}>
+              <h3 className="text-[14px] font-semibold text-white">{h}</h3>
+              <ul className="mt-4 space-y-2.5">{links.map((l) => <li key={l}><a href="#" className="text-[15px] text-white/60 hover:text-white">{l}</a></li>)}</ul>
+            </div>
+          ))}
+        </div>
+        <div className="flex flex-col gap-2 py-6 text-[13.5px] text-white/45 sm:flex-row sm:justify-between">
+          <p>© 2026 London Business Training Academy. Prototype with sample data.</p>
+          <p>Privacy · Terms · Cookies</p>
+        </div>
+      </Container>
+    </footer>
+  );
+}
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+function HomePage() {
+  const inputRef = useRef(null);
+  const [filters, setFilters] = useState({ q: '', category: '', location: '', format: '', month: '' });
+  const [searched, setSearched] = useState(false);
+
+  const focusSearch = () => {
+    document.getElementById('courses')?.scrollIntoView({ block: 'start' });
+    setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 350);
+  };
+  const pickCategory = (id) => {
+    setFilters({ q: '', category: id, location: '', format: '', month: '' });
+    setSearched(true);
+    setTimeout(() => document.getElementById('results')?.scrollIntoView({ block: 'start' }), 30);
+  };
+
+  return (
+    <>
+      <Header onSearchClick={focusSearch} />
+      <main>
+        <Hero onExplore={focusSearch} />
+        <CourseSearch inputRef={inputRef} filters={filters} setFilters={setFilters} searched={searched} setSearched={setSearched} />
+        <Trust />
+        <Categories onPick={pickCategory} />
+        <Featured />
+        <AISection />
+        <ContactCTA />
+      </main>
+      <Footer />
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<HomePage />);
+</script>
+</body>
+</html>
